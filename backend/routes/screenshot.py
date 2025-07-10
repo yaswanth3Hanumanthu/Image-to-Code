@@ -1,4 +1,5 @@
 import base64
+import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import httpx
@@ -75,7 +76,8 @@ async def capture_screenshot(
 
 class ScreenshotRequest(BaseModel):
     url: str
-    apiKey: str
+    # apiKey is now optional since we can use environment variable
+    apiKey: str | None = None
 
 
 class ScreenshotResponse(BaseModel):
@@ -86,7 +88,15 @@ class ScreenshotResponse(BaseModel):
 async def app_screenshot(request: ScreenshotRequest):
     # Extract the URL from the request body
     url = request.url
-    api_key = request.apiKey
+    
+    # Use API key from request if provided, otherwise from environment
+    api_key = request.apiKey or os.getenv("SCREENSHOT_API_KEY")
+    
+    if not api_key:
+        raise HTTPException(
+            status_code=400, 
+            detail="Screenshot API key not provided. Either include it in the request or set SCREENSHOT_API_KEY environment variable."
+        )
 
     try:
         # Normalize the URL

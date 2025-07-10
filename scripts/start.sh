@@ -25,7 +25,34 @@ docker-compose up --build -d
 echo "⏳ Waiting for services to start..."
 sleep 10
 
-# 5. Check service status
+# 5. Function to check if we're in Codespaces
+is_codespaces() {
+    [ -n "$CODESPACE_NAME" ]
+}
+
+# 6. Attempt to make ports public automatically
+if is_codespaces; then
+    echo "🔓 Configuring port visibility for Codespaces..."
+    
+    # Try multiple methods to make ports public
+    {
+        echo "📡 Attempting automatic port configuration..."
+        
+        # Method 1: Use GitHub CLI if available
+        if command -v gh &> /dev/null; then
+            gh codespace ports visibility 5173:public 7001:public --codespace "$CODESPACE_NAME" 2>/dev/null && echo "✅ Ports configured via GitHub CLI" || echo "⚠️  GitHub CLI method failed"
+        fi
+        
+        # Method 2: Try VS Code commands
+        if command -v code &> /dev/null; then
+            code --command workbench.action.remote.forwardPort --args '{"port": 5173, "label": "Frontend"}' 2>/dev/null || true
+            code --command workbench.action.remote.forwardPort --args '{"port": 7001, "label": "Backend"}' 2>/dev/null || true
+        fi
+        
+    } || echo "⚠️  Automatic port configuration failed - manual setup required"
+fi
+
+# 7. Check service status
 echo "🔍 Checking service status..."
 
 # Check backend
@@ -46,9 +73,15 @@ echo ""
 echo "🎉 Setup complete!"
 echo ""
 echo "📱 Access the app at:"
-if [ -n "$CODESPACE_NAME" ]; then
+if is_codespaces; then
     echo "   🌐 Frontend: https://$CODESPACE_NAME-5173.app.github.dev"
     echo "   🔧 Backend:  https://$CODESPACE_NAME-7001.app.github.dev"
+    echo ""
+    echo "💡 IMPORTANT: If you get connection errors:"
+    echo "   1. Go to the 'PORTS' tab in VS Code (bottom panel)"
+    echo "   2. Find ports 5173 and 7001"
+    echo "   3. Right-click each port → 'Change Port Visibility' → 'Public'"
+    echo "   4. Refresh your browser"
 else
     echo "   🌐 Frontend: http://localhost:5173"
     echo "   🔧 Backend:  http://localhost:7001"

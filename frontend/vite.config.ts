@@ -6,7 +6,27 @@ import { createHtmlPlugin } from "vite-plugin-html";
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+  const env = loadEnv(mode, process.cwd());
+  process.env = { ...process.env, ...env };
+  
+  // Environment-aware backend URL detection
+  const getBackendUrl = () => {
+    // Check if we have explicit backend URL from environment
+    if (env.VITE_HTTP_BACKEND_URL) {
+      return env.VITE_HTTP_BACKEND_URL;
+    }
+    
+    // Check if we're in Codespaces
+    if (process.env.CODESPACE_NAME) {
+      return `https://${process.env.CODESPACE_NAME}-7001.app.github.dev`;
+    }
+    
+    // Default to localhost for local development
+    return 'http://localhost:7001';
+  };
+
+  const backendUrl = getBackendUrl();
+  
   return defineConfig({
     base: "",
     plugins: [
@@ -24,6 +44,16 @@ export default ({ mode }) => {
         },
       }),
     ],
+    server: {
+      proxy: {
+        '/api': {
+          target: backendUrl,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+          ws: true, // Enable WebSocket proxying
+        }
+      }
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

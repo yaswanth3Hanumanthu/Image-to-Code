@@ -2,35 +2,34 @@
   "name": "Image-to-Code",
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "18"
-    },
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.11"
-    }
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "forwardPorts": [5173, 7001],
   "portsAttributes": {
     "5173": {
       "label": "Frontend",
-      "onAutoForward": "notify"
+      "onAutoForward": "openBrowser",
+      "visibility": "public",
+      "protocol": "https"
     },
     "7001": {
-      "label": "Backend API",
-      "onAutoForward": "notify"
+      "label": "Backend API", 
+      "visibility": "public",
+      "protocol": "https"
     }
   },
-  "postCreateCommand": "npm install -g yarn && cd frontend && yarn install",
+  "postCreateCommand": "chmod +x scripts/*.sh && echo 'Image-to-Code setup complete! Run: ./scripts/start.sh'",
   "postStartCommand": "./scripts/setup-codespaces.sh",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
-        "ms-vscode.vscode-typescript-next",
-        "bradlc.vscode-tailwindcss",
-        "ms-vscode.vscode-json"
-      ]
+        "bradlc.vscode-tailwindcss", 
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "typescript.preferences.importModuleSpecifier": "relative"
+      }
     }
   }
 }
