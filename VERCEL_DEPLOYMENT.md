@@ -18,7 +18,6 @@ chmod +x scripts/deploy-backend-railway.sh
 3. Gives you a backend URL like: `https://your-app-name.up.railway.app`
 
 **Set these environment variables in Railway dashboard:**
-- `GEMINI_API_KEY=AIzaSyDRYDilIlh2dc9vw5uEiAgepE2V5qWmWXk`
 - `OPENAI_API_KEY` (optional)
 - `ANTHROPIC_API_KEY` (optional)
 
