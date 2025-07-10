@@ -77,10 +77,10 @@ if [ ! -f "$BACKEND_ENV" ]; then
 # Required: At least one AI provider API key
 # OPENAI_API_KEY=your_openai_key_here
 # ANTHROPIC_API_KEY=your_anthropic_key_here
-GEMINI_API_KEY=AIzaSyDRYDilIlh2dc9vw5uEiAgepE2V5qWmWXk
+
 
 # Optional: Screenshot service
-SCREENSHOT_API_KEY=b5236277eb6f212086e9
+
 
 # Optional: Image generation
 # REPLICATE_API_KEY=your_replicate_key_here
